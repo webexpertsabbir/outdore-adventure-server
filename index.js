@@ -9,7 +9,10 @@ const cors = require("cors");
 app.use(cors());
 app.use(express.json());
 
-const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.q66zrl2.mongodb.net/?retryWrites=true&w=majority`;
+
+
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@sabbir.0dgpj5g.mongodb.net/?retryWrites=true&w=majority`;
+console.log(uri)
 const client = new MongoClient(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -18,20 +21,30 @@ const client = new MongoClient(uri, {
 
 const run = async () => {
   try {
-    const db = client.db("moontech");
-    const productCollection = db.collection("product");
+    const db = client.db("outdore");
+    const postCollection = db.collection("blogPost");
 
-    app.get("/products", async (req, res) => {
-      const cursor = productCollection.find({});
-      const product = await cursor.toArray();
+    app.get("/posts", async (req, res) => {
+      // const cursor = postCollection.find({});
+      // const product = await cursor.toArray();
 
-      res.send({ status: true, data: product });
+      // res.send({ status: true, data: product });
+      const query = {};
+      const posts = await postCollection.find(query).toArray();
+      res.send(posts);
     });
 
-    app.post("/product", async (req, res) => {
+    app.get('/posts/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const singelPost = await postCollection.findOne(query);
+      res.send(singelPost)
+    });
+
+    app.post("/posts", async (req, res) => {
       const product = req.body;
 
-      const result = await productCollection.insertOne(product);
+      const result = await postCollection.insertOne(product);
 
       res.send(result);
     });
@@ -39,7 +52,7 @@ const run = async () => {
     app.delete("/product/:id", async (req, res) => {
       const id = req.params.id;
 
-      const result = await productCollection.deleteOne({ _id: ObjectId(id) });
+      const result = await postCollection.deleteOne({ _id: ObjectId(id) });
       res.send(result);
     });
   } finally {
