@@ -12,7 +12,7 @@ app.use(express.json());
 
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@sabbir.0dgpj5g.mongodb.net/?retryWrites=true&w=majority`;
-console.log(uri)
+// console.log(uri)
 const client = new MongoClient(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -49,7 +49,20 @@ const run = async () => {
       res.send(result);
     });
 
-    app.delete("/product/:id", async (req, res) => {
+    app.put('/posts/:id', async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: ObjectId(id) }
+      const about = req.body;
+      // const updatedDoc = {
+      //     $set: {
+      //         loveReact,
+      //     }
+      // }
+      const result = await postCollection.replaceOne(filter, about);
+      res.send(result);
+  });
+
+    app.delete("/post/:id", async (req, res) => {
       const id = req.params.id;
 
       const result = await postCollection.deleteOne({ _id: ObjectId(id) });
